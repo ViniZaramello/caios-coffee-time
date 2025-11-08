@@ -125,9 +125,9 @@ fun CoffeeTimeScreen(
 
                 Text(
                     text = if (isCoffeeTime)
-                        "Aproveite sua pausa para um cafezinho"
+                        "Aproveite o seu cafezinho"
                     else
-                        "Ainda não chegou a hora da pausa",
+                        "Aguarde até amanhã para o próximo café",
                     fontSize = 24.sp,
                     color = Color(0xFF666666),
                     textAlign = TextAlign.Center,
