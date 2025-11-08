@@ -1,10 +1,7 @@
-# Multi-stage build para otimizar o tamanho da imagem final
 FROM gradle:8.5-jdk17 AS builder
 
-# Define o diretório de trabalho
 WORKDIR /app
 
-# Copia os arquivos de configuração do Gradle
 COPY gradle gradle
 COPY gradlew .
 COPY gradlew.bat .
@@ -12,21 +9,16 @@ COPY gradle.properties .
 COPY settings.gradle.kts .
 COPY build.gradle.kts .
 
-# Copia os módulos necessários
 COPY shared shared
 COPY composeApp composeApp
 
-# Build do projeto wasmJs (gera os arquivos estáticos)
 RUN chmod +x ./gradlew && \
     ./gradlew :composeApp:wasmJsBrowserDistribution --no-daemon
 
-# Stage 2: Servidor web leve para servir os arquivos estáticos
 FROM nginx:alpine
 
-# Copia os arquivos buildados do stage anterior
 COPY --from=builder /app/composeApp/build/dist/wasmJs/productionExecutable /usr/share/nginx/html
 
-# Cria configuração customizada do nginx
 RUN echo 'server {' > /etc/nginx/conf.d/default.conf && \
     echo '    listen 80;' >> /etc/nginx/conf.d/default.conf && \
     echo '    server_name localhost;' >> /etc/nginx/conf.d/default.conf && \
@@ -49,9 +41,7 @@ RUN echo 'server {' > /etc/nginx/conf.d/default.conf && \
     echo '    }' >> /etc/nginx/conf.d/default.conf && \
     echo '}' >> /etc/nginx/conf.d/default.conf
 
-# Expõe a porta 80
-EXPOSE 80
+EXPOSE 8080
 
-# Comando para iniciar o nginx
 CMD ["nginx", "-g", "daemon off;"]
 
